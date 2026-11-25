@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ---- player shell (not part of the video frame) ---- */
+  html, body { margin: 0; height: 100%; background: #111; color: #ddd; font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #viewport { position: absolute; inset: 0 0 56px 0; overflow: hidden; }
+  html.bare #viewport { inset: 0; }
+  #stage { position: absolute; left: 50%; top: 50%; transform-origin: center center; overflow: hidden; background: var(--bg); color: var(--ink); }
+  html.bare #controls { display: none; }
+  #controls { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box; background: #1a1a1a; }
+  #controls button { width: 36px; height: 36px; border: 0; border-radius: 6px; background: #2a2a2a; color: #eee; cursor: pointer; font-size: 14px; }
+  #track { position: relative; flex: 1; }
+  #scrub { width: 100%; margin: 0; }
+  #marks { position: absolute; inset: -6px 0 auto 0; height: 4px; pointer-events: none; }
+  #marks i { position: absolute; width: 2px; height: 8px; background: #888; }
+  #tc { font-variant-numeric: tabular-nums; min-width: 72px; }
+  #bn { color: #888; min-width: 120px; }
+  html.render #stage { left: 0; top: 0; }
+
+  /* ---- video frame: beats stack on the stage, runtime toggles visibility ---- */
+  [data-beat] { position: absolute; inset: 0; visibility: hidden; }
+</style>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <!-- one <section data-beat="<id>"> per beat in video.md, in order.
+           Every element worth measuring gets data-el="<beat-id>.<name>". -->
+      __BEATS__
+    </div>
+  </div>
+  <div id="controls"></div>
+  <script src="timeline.js"></script>
+  <script src="runtime.js"></script>
+</body>
+</html>
