@@ -41,6 +41,12 @@ the `video-fixer` agent, which only works from the main thread.
      tell me "done"
    - when nothing needs changing, press **Approve** and tell me "approved"
 
+The viewer assumes Claude and the browser are on the same machine (a local
+Claude Code session). If the user's browser can't reach the server (for
+example Claude is running in a cloud session), the Send button copies the
+notes to the clipboard instead and the user pastes them in chat — handle
+those exactly like `notes.json`.
+
 Then wait.
 
 ## Step 2 — Read the round

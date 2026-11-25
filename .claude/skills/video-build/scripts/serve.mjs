@@ -45,6 +45,7 @@ export function serve(dir = 'video', port = 0) {
         }
         let data; try { data = JSON.parse(body); } catch { return send(400, '{"error":"bad json"}'); }
         const out = { round: prev.round + 1, submittedAt: new Date().toISOString(), notes: data.notes || [] };
+        fs.rmSync(path.join(reviewDir, 'approved.json'), { force: true }); // new notes cancel an earlier approval
         fs.writeFileSync(notesFile, JSON.stringify(out, null, 2));
         // archive every round so nothing is lost
         fs.writeFileSync(path.join(reviewDir, `notes.round-${out.round}.json`), JSON.stringify(out, null, 2));

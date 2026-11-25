@@ -137,11 +137,23 @@ try {
         fontSize: parseFloat(s.fontSize), fontFamily: s.fontFamily.split(',')[0].replace(/["']/g, ''),
         color: s.color,
         contrast: hasText ? +((Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)).toFixed(2) : null,
-        overflowX: e.scrollWidth > e.clientWidth + 1 && s.overflowX !== 'visible' ? e.scrollWidth - e.clientWidth : (hasText && e.scrollWidth > e.clientWidth + 1 && e.clientWidth > 0 ? e.scrollWidth - e.clientWidth : 0),
-        overflowY: hasText && e.clientHeight > 0 && e.scrollHeight > e.clientHeight + 1 ? e.scrollHeight - e.clientHeight : 0,
+        // text overflow = the laid-out line boxes extend past the element's content box
+        // (robust to tight line-height, unlike scrollHeight)
+        ...(() => {
+          if (!hasText || !e.clientWidth) return { overflowX: 0, overflowY: 0 };
+          const rg = document.createRange(); rg.selectNodeContents(e);
+          const tr = rg.getBoundingClientRect(), cs = s;
+          const right = r.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth);
+          const left = r.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth);
+          const bottom = r.bottom - parseFloat(cs.paddingBottom) - parseFloat(cs.borderBottomWidth);
+          const ox = Math.max(0, tr.right - right, left - tr.left), oy = Math.max(0, tr.bottom - bottom);
+          // glyph content area is taller than a tight line-height; a real extra line overflows by ≥ 1 line
+          const slackY = 0.25 * parseFloat(cs.fontSize);
+          return { overflowX: ox > 1 ? +ox.toFixed(1) : 0, overflowY: oy > slackY ? +oy.toFixed(1) : 0 };
+        })(),
         outside: r.left < stage.left - 0.5 || r.top < stage.top - 0.5 || r.right > stage.right + 0.5 || r.bottom > stage.bottom + 0.5,
         outsideSafe: safe > 0 && hasText && (box.x < safe || box.y < safe || box.x + box.w > W - safe || box.y + box.h > H - safe),
-        allowOverlap: e.hasAttribute('data-allow-overlap'), decorative: e.hasAttribute('data-decorative'),
+        allowOverlap: e.hasAttribute('data-allow-overlap'), decorative: e.hasAttribute('data-decorative'), bleed: e.hasAttribute('data-bleed'),
         node: e,
       };
     });
@@ -149,6 +161,7 @@ try {
     for (let i = 0; i < out.length; i++) for (let j = i + 1; j < out.length; j++) {
       const a = out[i], b = out[j];
       if (a.allowOverlap || b.allowOverlap || a.decorative || b.decorative) continue;
+      if (a.bleed || b.bleed) { if (!(a.text && b.text)) continue; }
       if (a.node.contains(b.node) || b.node.contains(a.node)) continue;
       const ix = Math.max(0, Math.min(a.box.x + a.box.w, b.box.x + b.box.w) - Math.max(a.box.x, b.box.x));
       const iy = Math.max(0, Math.min(a.box.y + a.box.h, b.box.y + b.box.h) - Math.max(a.box.y, b.box.y));
@@ -160,16 +173,22 @@ try {
   }, { t, onlyEls, safe: info.safe });
 
   const onlyEls = only ? only.split(',') : null;
-  const times = at ? at.split(',').map(Number)
-    : info.beats.flatMap((b) => [b.start + 0.05, (b.start + b.end) / 2, b.end - 0.05]).filter((t) => t >= 0 && t < info.duration);
+  // kind 'mid' = the settled middle of a beat; 'edge' = near a beat boundary (entrances/exits in flight)
+  const times = at ? at.split(',').map((t) => [+t, 'mid'])
+    : info.beats.flatMap((b) => [[b.start + 0.05, 'edge'], [(b.start + b.end) / 2, 'mid'], [b.end - 0.05, 'edge']]).filter(([t]) => t >= 0 && t < info.duration);
   const samples = [];
-  for (const t of times) {
+  for (const [t, kind] of times) {
     const s = await measureAt(+t.toFixed(3), onlyEls);
     samples.push(s);
     const where = (e) => `${e.el} @ ${s.t.toFixed(2)}s`;
     for (const e of s.els) {
-      if (e.outside && !e.decorative) P('error', where(e), `outside the stage ${JSON.stringify(e.box)}`);
-      if (e.outsideSafe) P('warn', where(e), `text outside safe area (${info.safe}px) ${JSON.stringify(e.box)}`);
+      // Off-stage: elements sliding in/out and full-bleed art are legitimate. Only text that is
+      // still clipped by the stage in the settled middle of its beat is an error.
+      if (e.outside && !e.decorative && !e.bleed) {
+        if (e.text && kind === 'mid') P('error', where(e), `text is cut off by the stage edge ${JSON.stringify(e.box)} (data-bleed if intended)`);
+        else if (kind === 'mid') P('warn', where(e), `extends past the stage ${JSON.stringify(e.box)} (data-bleed if intended)`);
+      }
+      if (e.outsideSafe && kind === 'mid' && !e.bleed) P('warn', where(e), `text outside safe area (${info.safe}px) ${JSON.stringify(e.box)}`);
       if (e.overflowX) P('error', where(e), `text overflows its box horizontally by ${e.overflowX}px`);
       if (e.overflowY) P('error', where(e), `text overflows its box vertically by ${e.overflowY}px`);
       if (e.text && e.fontSize < info.height * 0.022) P('warn', where(e), `font-size ${e.fontSize}px is small for a ${info.height}px stage`);

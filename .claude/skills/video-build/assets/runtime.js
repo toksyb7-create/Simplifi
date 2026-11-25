@@ -78,10 +78,13 @@
   }
 
   // ---- audio --------------------------------------------------------------------
-  let audio = null;
+  // audioState: 'none' (no music) | 'ready' | 'playing' | 'blocked' (browser refused play) | 'error' (file failed)
+  let audio = null, audioState = 'none';
   if (V.music && V.music.src) {
     audio = new Audio(V.music.src);
     audio.preload = 'auto';
+    audioState = 'ready';
+    audio.addEventListener('error', () => { audioState = 'error'; console.error('music failed to load: ' + V.music.src); ui.state(); });
   }
   const trim = (V.music && V.music.trimStart) || 0;
   const fadeOut = (V.music && V.music.fadeOut) || 0;
@@ -104,7 +107,11 @@
     if (playing) return;
     if (current >= V.duration - 1 / V.fps) current = 0;
     playing = true; tStart = current; wallStart = performance.now();
-    if (audio) { audio.currentTime = current + trim; audio.volume = 1; audio.play().catch(() => {}); }
+    if (audio && audioState !== 'error') {
+      audio.currentTime = current + trim; audio.volume = 1;
+      audio.play().then(() => { audioState = 'playing'; ui.state(); })
+        .catch((e) => { audioState = 'blocked'; console.warn('music blocked: ' + e.message); ui.state(); });
+    }
     raf = requestAnimationFrame(loop);
     ui.state();
   }
@@ -112,7 +119,7 @@
     if (!playing) return;
     current = now(); playing = false;
     cancelAnimationFrame(raf);
-    if (audio) audio.pause();
+    if (audio) { audio.pause(); if (audioState === 'playing') audioState = 'ready'; }
     ui.state();
   }
   function setTime(t) {
@@ -129,9 +136,9 @@
     c.innerHTML = `
       <button id="pp" aria-label="Play">▶</button>
       <div id="track"><input id="scrub" type="range" min="0" max="${V.duration}" step="${1 / V.fps}" value="0"><div id="marks"></div></div>
-      <span id="tc">0:00.00</span><span id="bn"></span>`;
+      <span id="tc">0:00.00</span><span id="bn"></span><span id="au"></span>`;
     const pp = c.querySelector('#pp'), scrub = c.querySelector('#scrub');
-    const tc = c.querySelector('#tc'), bn = c.querySelector('#bn'), marks = c.querySelector('#marks');
+    const tc = c.querySelector('#tc'), bn = c.querySelector('#bn'), marks = c.querySelector('#marks'), au = c.querySelector('#au');
     for (const b of V.beats) {
       const m = document.createElement('i');
       m.style.left = (b.start / V.duration) * 100 + '%';
@@ -149,7 +156,11 @@
     const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`;
     return {
       sync(t, b) { scrub.value = t; tc.textContent = fmt(t); bn.textContent = b ? b.id : ''; },
-      state() { pp.textContent = playing ? '❚❚' : '▶'; pp.setAttribute('aria-label', playing ? 'Pause' : 'Play'); },
+      state() {
+        pp.textContent = playing ? '❚❚' : '▶'; pp.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+        au.textContent = { none: 'no music', blocked: 'music blocked — press ▶ again', error: 'music file failed to load' }[audioState] || '';
+        au.style.color = audioState === 'blocked' || audioState === 'error' ? '#f85149' : '#888';
+      },
     };
   })();
 
@@ -174,6 +185,7 @@
   window.__video = {
     get duration() { return V.duration; }, get fps() { return V.fps; }, get beats() { return V.beats; },
     get time() { return current; }, get playing() { return playing; }, get hasAudio() { return !!audio; },
+    get audio() { return audio ? { state: audioState, currentTime: audio.currentTime - trim, paused: audio.paused } : { state: 'none' }; },
     ready, seek, play, pause, setTime, toggle: () => (playing ? pause() : play()),
   };
 })();

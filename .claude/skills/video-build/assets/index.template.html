@@ -20,6 +20,7 @@
   #marks i { position: absolute; width: 2px; height: 8px; background: #888; }
   #tc { font-variant-numeric: tabular-nums; min-width: 72px; }
   #bn { color: #888; min-width: 120px; }
+  #au { font-size: 12px; }
   html.render #stage { left: 0; top: 0; }
 
   /* ---- video frame: beats stack on the stage, runtime toggles visibility ---- */
@@ -31,7 +32,10 @@
   <div id="viewport">
     <div id="stage">
       <!-- one <section data-beat="<id>"> per beat in video.md, in order.
-           Every element worth measuring gets data-el="<beat-id>.<name>". -->
+           Every element worth measuring gets data-el="<beat-id>.<name>".
+           Anything that spans beats (watermark, persistent logo, an element carried
+           through a transition) goes directly in #stage, after the sections, with
+           data-el="global.<name>", and is shown/hidden/animated from update(t). -->
       __BEATS__
     </div>
   </div>

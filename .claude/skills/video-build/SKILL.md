@@ -79,8 +79,19 @@ video/
      one-value change.
 5. **Markup.** Every element that matters gets `data-el="<beat-id>.<name>"`
    (e.g. `hero.title`, `hero.cta`). Copy text **verbatim** from the brief.
-   Mark intentional overlaps with `data-allow-overlap` and pure decoration
-   (backgrounds, grain, shapes) with `data-decorative`.
+   Mark intentional overlaps with `data-allow-overlap`, pure decoration
+   (backgrounds, grain, shapes) with `data-decorative`, and intentional
+   bleed past the stage edge (full-bleed art, crops) with `data-bleed`.
+   Elements sliding in from off-stage need no marker — off-stage only counts
+   as an error for text still cut off in the middle of its beat.
+6. **Things that span beats.** Beat sections are shown only during their
+   beat. A watermark, a persistent logo, or an element carried across a
+   transition goes directly inside `#stage` after the sections, with
+   `data-el="global.<name>"`, and `update(t)` controls its visibility and
+   motion over the whole timeline. A transition between two beats is built
+   the same way, or by overlapping the outgoing beat's exit with the next
+   beat's entrance inside their own time ranges — never by changing beat
+   `start`/`end`.
 
 ### Determinism rules
 
@@ -111,8 +122,10 @@ It loads the page with `?render=1`, waits for fonts and images, and reports:
 - failed asset requests, console errors, fonts used but not loaded
 - music loads and is long enough for `trimStart + duration`
 - per sample (each beat at start, middle, end) for every visible `data-el`:
-  box in stage pixels, outside the stage, outside the safe area, text
-  overflow, overlap with other elements, font size too small, contrast
+  box in stage pixels, text overflowing its box (measured from the laid-out
+  lines, so tight leading is fine), overlap with other elements, font size
+  too small, contrast; text cut off by the stage edge or outside the safe area
+  in the middle of a beat
 - determinism: the same `t` after a different seek history gives the same
   boxes and opacities
 - reading time: every text element is on screen at least
