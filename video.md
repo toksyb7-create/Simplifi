@@ -97,7 +97,7 @@ Beats tile 0 → `duration` with no gaps. Times in seconds; all starts are on 2.
 ### `the-turn` · `start` 7.50 → `end` 12.50 · bars 4–5
 - On screen: hard cut to `--bg`. The "+" grows at stage centre (signature transition), then the logo assembles centred at 1.6× (plus 64 px). Below it, centred: headline, then sub (max width 1200).
 - Copy: "Meet SyloCare for Business." (`--fs-h1`, `--ink`; "SyloCare for Business" as `<em>`, `--accent-text`) · "A real system built around how a distributed team actually runs." (`--fs-body`, `--muted`)
-- Motion: "+" scale 0→1 at 7.50 over 0.50 s. Wordmark text enter at 7.70. Headline text enter at 7.90. Sub text enter at 8.125.
+- Motion: "+" scale 0→1 at 7.50 over 0.50 s. Wordmark text enter at 7.70. Headline text enter at 7.90. Sub text enter at 8.00.
 - Music cue: transition on the 7.50 bar line.
 - Assets: logo (CSS)
 
@@ -183,7 +183,7 @@ Decisions made without the user's explicit input (veto any of them):
 - What changes from the reference: UI is rebuilt large instead of panned screen captures; numbered dark pills become step captions in the top-left; no radial gradients; one signature transition; length 57.5 s (vs 58.5 s) so it ends on a bar line.
 - Music is the reference's own track, reused as-is. This assumes you have the right to it, since it came from your video.
 - Direction A (brand light) for the middle, with flat dark-green bookends taken from the reference — the look you approved plus the reference's opening and closing.
-- The reference's catalog shows "Kenya · Coming soon" while its caption and the site say there are HMO networks in all three countries. The video states three markets and shows the Kenya chip with no status. **Confirm Kenya is live**; if not, the `markets` headline becomes "Regulated HMO networks in Nigeria and Ghana — Kenya next."
+- Kenya is live (confirmed by the user). The reference's "Kenya · Coming soon" catalog chip is out of date; the video shows Kenya as a normal market.
 - The four employee rows (Ada Obi, Kwame M. from SyloCare's site; Chidinma E. and Tunde A. added) are sample data.
 - Font is Plus Jakarta Sans, judged from the site and the reference; swap if SyloCare uses a different face.
 - Green text on light uses the darker `--accent-text` for readability; on dark, and in fills, the bright brand green is used.

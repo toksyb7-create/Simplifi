@@ -1,0 +1,55 @@
+/* Fonts: Plus Jakarta Sans (OFL, see assets/fonts/OFL.txt). Variable font, one file per subset. */
+@font-face {
+  font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: block;
+  src: url(assets/fonts/PlusJakartaSans-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: block;
+  src: url(assets/fonts/PlusJakartaSans-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Tokens — copied verbatim from video.md §4 */
+:root {
+  /* palette */
+  --bg: #F5F7F5;
+  --surface: #FFFFFF;
+  --ink: #0F1A13;
+  --muted: #5E6A62;
+  --line: #E3E8E4;
+  --track: #EEF1EE;
+  --accent: #22DD1A;
+  --accent-text: #119A0C;
+  --accent-tint: #E8FBE6;
+  --deep: #0A3A26;
+  --deep-2: #0E4A31;
+  --on-deep: #F2F7F3;
+  --on-deep-muted: #A9C2B3;
+
+  /* type */
+  --font: "Plus Jakarta Sans", sans-serif;
+  --fs-display: 112px;
+  --fs-h1: 80px;
+  --fs-h2: 52px;
+  --fs-body: 34px;
+  --fs-ui: 30px;
+  --fs-caption: 24px;
+  /* derived sizes named in the brief */
+  --fs-stat: 120px;        /* markets "3" */
+  --fs-plan-title: 38px;   /* plan card at 1.25x UI */
+  --fs-cta-btn: 39px;      /* Get Started at 1.3x */
+  --fs-logo: 34px;
+  --fs-logo-sub: 12px;
+  --lh-display: 1.02;
+  --lh-h1: 1.04;
+  --lh-h2: 1.15;
+  --lh-body: 1.35;
+  --track-tight: -0.035em;
+  --track-h2: -0.02em;
+
+  /* layout */
+  --safe: 96px;
+  --radius-card: 32px;
+  --shadow-card: 0 2px 0 rgba(15, 26, 19, .04), 0 30px 60px -30px rgba(15, 26, 19, .25);
+}

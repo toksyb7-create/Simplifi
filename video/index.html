@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SyloCare for Business explainer</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ---- player shell (not part of the video frame) ---- */
+  html, body { margin: 0; height: 100%; background: #111; color: #ddd; font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #viewport { position: absolute; inset: 0 0 56px 0; overflow: hidden; }
+  html.bare #viewport { inset: 0; }
+  #stage { position: absolute; left: 50%; top: 50%; transform-origin: center center; overflow: hidden; background: var(--bg); color: var(--ink); }
+  html.bare #controls { display: none; }
+  #controls { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box; background: #1a1a1a; }
+  #controls button { width: 36px; height: 36px; border: 0; border-radius: 6px; background: #2a2a2a; color: #eee; cursor: pointer; font-size: 14px; }
+  #track { position: relative; flex: 1; }
+  #scrub { width: 100%; margin: 0; }
+  #marks { position: absolute; inset: -6px 0 auto 0; height: 4px; pointer-events: none; }
+  #marks i { position: absolute; width: 2px; height: 8px; background: #888; }
+  #tc { font-variant-numeric: tabular-nums; min-width: 72px; }
+  #bn { color: #888; min-width: 120px; }
+  #au { font-size: 12px; }
+  html.render #stage { left: 0; top: 0; }
+
+  /* ---- video frame: beats stack on the stage, runtime toggles visibility ---- */
+  [data-beat] { position: absolute; inset: 0; visibility: hidden; }
+</style>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <!-- one <section data-beat="<id>"> per beat in video.md, in order.
+           Every element worth measuring gets data-el="<beat-id>.<name>".
+           Anything that spans beats (watermark, persistent logo, an element carried
+           through a transition) goes directly in #stage, after the sections, with
+           data-el="global.<name>", and is shown/hidden/animated from update(t). -->
+
+      <!-- 1 cold-open 0.00–7.50 -->
+      <section data-beat="cold-open" class="dark">
+        <p class="abs co-l1" data-el="cold-open.line1">From London, New York, Toronto or Dubai,</p>
+        <p class="abs co-l2" data-el="cold-open.line2">your team works across</p>
+        <div class="abs co-line a" data-el="cold-open.line-a" data-decorative></div>
+        <div class="abs co-line b" data-el="cold-open.line-b" data-decorative></div>
+        <div class="abs co-dot" style="left:640px" data-el="cold-open.dot-lagos" data-decorative></div>
+        <div class="abs co-dot" style="left:960px" data-el="cold-open.dot-accra" data-decorative></div>
+        <div class="abs co-dot" style="left:1280px" data-el="cold-open.dot-nairobi" data-decorative></div>
+        <div class="abs co-city" style="left:640px" data-el="cold-open.lagos"><b data-el="cold-open.lagos-name">Lagos</b><span data-el="cold-open.lagos-code">NG</span></div>
+        <div class="abs co-city" style="left:960px" data-el="cold-open.accra"><b data-el="cold-open.accra-name">Accra</b><span data-el="cold-open.accra-code">GH</span></div>
+        <div class="abs co-city" style="left:1280px" data-el="cold-open.nairobi"><b data-el="cold-open.nairobi-name">Nairobi</b><span data-el="cold-open.nairobi-code">KE</span></div>
+        <h1 class="abs h1 co-close" data-el="cold-open.close">Their health cover should keep up.</h1>
+      </section>
+
+      <!-- 2 the-turn 7.50–12.50 -->
+      <section data-beat="the-turn">
+        <div class="abs turn-logo"><div class="logo"><span class="plus" data-el="the-turn.plus" data-decorative></span><span class="wm" data-el="the-turn.wordmark">SyloCare<small>BUSINESS</small></span></div></div>
+        <h1 class="abs h1 turn-h" data-el="the-turn.headline">Meet <em>SyloCare for Business.</em></h1>
+        <p class="abs body turn-sub" data-el="the-turn.sub">A real system built around how a distributed team actually runs.</p>
+      </section>
+
+      <!-- 3 markets 12.50–17.50 -->
+      <section data-beat="markets">
+        <span class="abs pill mk-pill" data-el="markets.pill">WHERE YOU CAN HIRE</span>
+        <h1 class="abs h1 mk-h" data-el="markets.headline">Regulated HMO networks in Nigeria, Ghana and Kenya.</h1>
+        <div class="abs mk-cards">
+          <div class="card mk-card" data-el="markets.card-ng"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#008751"/><rect x="2" width="1" height="2" fill="#008751"/></svg><b data-el="markets.ng-name">Nigeria</b><span data-el="markets.ng-cur">NGN · ₦</span></div>
+          <div class="card mk-card" data-el="markets.card-gh"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height=".667" fill="#CE1126"/><rect y=".667" width="3" height=".667" fill="#FCD116"/><rect y="1.333" width="3" height=".667" fill="#006B3F"/><polygon fill="#000" points="1.5,.72 1.556,.89 1.734,.89 1.59,.995 1.645,1.165 1.5,1.06 1.355,1.165 1.41,.995 1.266,.89 1.444,.89"/></svg><b data-el="markets.gh-name">Ghana</b><span data-el="markets.gh-cur">GHS · ₵</span></div>
+          <div class="card mk-card" data-el="markets.card-ke"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="3" height=".6" fill="#000"/><rect y=".7" width="3" height=".6" fill="#BB0000"/><rect y="1.4" width="3" height=".6" fill="#006600"/><ellipse cx="1.5" cy="1" rx=".22" ry=".42" fill="#BB0000" stroke="#000" stroke-width=".04"/></svg><b data-el="markets.ke-name">Kenya</b><span data-el="markets.ke-cur">KES · KSh</span></div>
+        </div>
+        <div class="abs mk-stat" data-el="markets.stat"><b data-el="markets.stat-num">3</b><span data-el="markets.stat-label">countries covered today</span></div>
+      </section>
+
+      <!-- 4 add-team 17.50–22.50 -->
+      <section data-beat="add-team">
+        <div class="step-cap"><span class="num" data-el="add-team.cap-num">1</span><span class="txt" data-el="add-team.cap">Add your employees, with their departments.</span></div>
+        <div class="card content emp-card" data-el="add-team.card">
+          <div class="emp-head"><h2 class="h2" data-el="add-team.title">Employees</h2>
+            <div class="chips"><span class="chip on" data-el="add-team.chip-ng">Nigeria <span data-el="add-team.count-ng">17</span> employees</span><span class="chip" data-el="add-team.chip-gh">Ghana 6 employees</span></div></div>
+          <div class="emp-row" data-el="add-team.row1"><div class="who"><span class="nm" data-el="add-team.row1-name">Ada Obi</span><span class="meta" data-el="add-team.row1-meta">· Engineering · Lagos</span></div><span class="chip tier" data-el="add-team.row1-tier">Premium</span></div>
+          <div class="emp-row" data-el="add-team.row2"><div class="who"><span class="nm" data-el="add-team.row2-name">Kwame M.</span><span class="meta" data-el="add-team.row2-meta">· Operations · Accra</span></div><span class="chip tier" data-el="add-team.row2-tier">Standard</span></div>
+          <div class="emp-row" data-el="add-team.row3"><div class="who"><span class="nm" data-el="add-team.row3-name">Chidinma E.</span><span class="meta" data-el="add-team.row3-meta">· Finance · Lagos</span></div><span class="chip tier" data-el="add-team.row3-tier">Standard</span></div>
+          <div class="emp-row" data-el="add-team.row4"><div class="who"><span class="nm" data-el="add-team.row4-name">Tunde A.</span><span class="meta" data-el="add-team.row4-meta">· Sales · Abuja</span></div><span class="chip tier" data-el="add-team.row4-tier">Premium</span></div>
+        </div>
+      </section>
+
+      <!-- 5 pick-plans 22.50–27.50 -->
+      <section data-beat="pick-plans">
+        <div class="step-cap"><span class="num" data-el="pick-plans.cap-num">2</span><span class="txt" data-el="pick-plans.cap">Browse plans for your team size.</span></div>
+        <div class="card content pc-card" data-el="pick-plans.card">
+          <div class="pc-head"><h2 class="h2" data-el="pick-plans.title">Plan Catalog</h2>
+            <div class="pc-tools"><span class="lbl" data-el="pick-plans.show-in">Show prices in</span><span class="select" data-el="pick-plans.select"><span class="val"><span data-el="pick-plans.sel-usd">USD</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="chip" data-el="pick-plans.saved">My Saved Plans (0)</span></div></div>
+          <div class="pc-chips"><span class="chip on" data-el="pick-plans.chip-ng">Nigeria 17 employees</span><span class="chip" data-el="pick-plans.chip-gh">Ghana 6 employees</span><span class="chip" data-el="pick-plans.chip-ke">Kenya</span></div>
+          <div class="pc-body">
+            <div class="notice" data-el="pick-plans.notice"><b data-el="pick-plans.notice-title">3 of 3 HMOs are open to your team of 17 in Nigeria</b><span data-el="pick-plans.notice-sub">AXA Mansard · Leadway Health · Bastion Health</span></div>
+            <div class="plan" data-el="pick-plans.plan">
+              <div class="pt" data-el="pick-plans.plan-title"><i>sylo</i>SME Cobalt (15–22, Starter)</div>
+              <span class="uw" data-el="pick-plans.plan-uw">Underwritten by AXA Mansard</span>
+              <span class="chip" data-el="pick-plans.plan-covers">COVERS UP TO 2 PEOPLE</span>
+              <span class="age" data-el="pick-plans.plan-age">Age: 18 – 65 years</span>
+              <span class="sz" data-el="pick-plans.plan-size">15–22 employees</span>
+              <div class="price"><b data-el="pick-plans.plan-price">$62.60</b><span data-el="pick-plans.plan-per">/ Yearly</span></div>
+              <div class="btn" data-el="pick-plans.save-btn"><span data-el="pick-plans.save-label" data-allow-overlap>Save to my list</span><span data-el="pick-plans.saved-label" data-allow-overlap><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Saved</span></div>
+            </div>
+          </div>
+        </div>
+        <svg class="pointer abs" data-el="pick-plans.pointer" data-decorative viewBox="0 0 32 44" aria-hidden="true"><path d="M3 2v34l9-8.5 6.5 14 6-2.8-6.4-13.6H31z" style="fill:var(--ink);stroke:var(--surface)" stroke-width="2.2" stroke-linejoin="round"/></svg>
+      </section>
+
+      <!-- 6 enrol-invoice 27.50–32.50 -->
+      <section data-beat="enrol-invoice">
+        <div class="step-cap"><span class="num" data-el="enrol-invoice.cap-num">3</span><span class="txt" data-el="enrol-invoice.cap">Batch, enrol, one combined invoice.</span></div>
+        <div class="card content inv-card" data-el="enrol-invoice.card">
+          <div class="inv-head"><div><h2 class="h2" data-el="enrol-invoice.title">Combined invoice</h2><span class="sub" data-el="enrol-invoice.sub">One invoice for everything you owe across your batches.</span>
+            <div class="inv-btns"><span class="btn sm outline" data-el="enrol-invoice.download">Download invoice</span><span class="btn sm" data-el="enrol-invoice.email">Email invoice</span></div></div>
+            <div class="inv-in"><span class="lbl" data-el="enrol-invoice.invoice-in">Invoice in</span><span class="select"><span class="val"><span data-el="enrol-invoice.sel-usd" data-allow-overlap data-cur="USD">USD</span><span data-el="enrol-invoice.sel-gbp" data-allow-overlap data-cur="GBP">GBP</span><span data-el="enrol-invoice.sel-aed" data-allow-overlap data-cur="AED">AED</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+          <div class="inv-row" data-el="enrol-invoice.row1"><span class="box" data-el="enrol-invoice.box1" data-decorative><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="what"><span class="nm" data-el="enrol-invoice.row1-name">Lagos engineering</span><span class="meta" data-el="enrol-invoice.row1-meta">AXA MANSARD · NG · 16 employees</span></div><div class="amt"><span data-el="enrol-invoice.row1-usd" data-allow-overlap data-cur="USD">$1,282.43</span><span data-el="enrol-invoice.row1-gbp" data-allow-overlap data-cur="GBP">£961.82</span><span data-el="enrol-invoice.row1-aed" data-allow-overlap data-cur="AED">AED 4,709.72</span></div></div>
+          <div class="inv-row" data-el="enrol-invoice.row2"><span class="box" data-el="enrol-invoice.box2" data-decorative><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="what"><span class="nm" data-el="enrol-invoice.row2-name">Abuja sales</span><span class="meta" data-el="enrol-invoice.row2-meta">LEADWAY HEALTH LIMITED · NG · 1 employee · instalment 1 of 2</span></div><div class="amt"><span data-el="enrol-invoice.row2-usd" data-allow-overlap data-cur="USD">$68.58</span><span data-el="enrol-invoice.row2-gbp" data-allow-overlap data-cur="GBP">£51.44</span><span data-el="enrol-invoice.row2-aed" data-allow-overlap data-cur="AED">AED 251.87</span></div></div>
+          <div class="inv-foot" data-el="enrol-invoice.foot"><span class="cap" data-el="enrol-invoice.selected">2 of 2 batches selected</span><div class="total"><span class="lbl" data-el="enrol-invoice.total-label">Total due:</span><div class="amt"><span data-el="enrol-invoice.total-usd" data-allow-overlap data-cur="USD">$1,351.01</span><span data-el="enrol-invoice.total-gbp" data-allow-overlap data-cur="GBP">£1,013.26</span><span data-el="enrol-invoice.total-aed" data-allow-overlap data-cur="AED">AED 4,961.59</span></div></div></div>
+        </div>
+      </section>
+
+      <!-- 7 currency 32.50–37.50 -->
+      <section data-beat="currency">
+        <div class="step-cap"><span class="num" data-el="currency.cap-num">4</span><span class="txt" data-el="currency.cap">Pay in USD, GBP, AED and more.</span></div>
+        <div class="card content inv-card" data-el="currency.card">
+          <div class="inv-head"><div><h2 class="h2" data-el="currency.title">Combined invoice</h2><span class="sub" data-el="currency.sub">One invoice for everything you owe across your batches.</span>
+            <div class="inv-btns"><span class="btn sm outline" data-el="currency.download">Download invoice</span><span class="btn sm" data-el="currency.email">Email invoice</span></div></div>
+            <div class="inv-in"><span class="lbl" data-el="currency.invoice-in">Invoice in</span><span class="select"><span class="val"><span data-el="currency.sel-usd" data-allow-overlap data-cur="USD">USD</span><span data-el="currency.sel-gbp" data-allow-overlap data-cur="GBP">GBP</span><span data-el="currency.sel-aed" data-allow-overlap data-cur="AED">AED</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+          <div class="inv-row" data-el="currency.row1"><span class="box" data-el="currency.box1" data-decorative><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="what"><span class="nm" data-el="currency.row1-name">Lagos engineering</span><span class="meta" data-el="currency.row1-meta">AXA MANSARD · NG · 16 employees</span></div><div class="amt"><span data-el="currency.row1-usd" data-allow-overlap data-cur="USD">$1,282.43</span><span data-el="currency.row1-gbp" data-allow-overlap data-cur="GBP">£961.82</span><span data-el="currency.row1-aed" data-allow-overlap data-cur="AED">AED 4,709.72</span></div></div>
+          <div class="inv-row" data-el="currency.row2"><span class="box" data-el="currency.box2" data-decorative><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="what"><span class="nm" data-el="currency.row2-name">Abuja sales</span><span class="meta" data-el="currency.row2-meta">LEADWAY HEALTH LIMITED · NG · 1 employee · instalment 1 of 2</span></div><div class="amt"><span data-el="currency.row2-usd" data-allow-overlap data-cur="USD">$68.58</span><span data-el="currency.row2-gbp" data-allow-overlap data-cur="GBP">£51.44</span><span data-el="currency.row2-aed" data-allow-overlap data-cur="AED">AED 251.87</span></div></div>
+          <div class="inv-foot" data-el="currency.foot"><span class="cap" data-el="currency.selected">2 of 2 batches selected</span><div class="total"><span class="lbl" data-el="currency.total-label">Total due:</span><div class="amt"><span data-el="currency.total-usd" data-allow-overlap data-cur="USD">$1,351.01</span><span data-el="currency.total-gbp" data-allow-overlap data-cur="GBP">£1,013.26</span><span data-el="currency.total-aed" data-allow-overlap data-cur="AED">AED 4,961.59</span></div></div></div>
+        </div>
+        <p class="abs body cur-note" data-el="currency.note">No forced conversion into naira, cedis, or shillings.</p>
+      </section>
+
+      <!-- 8 usage 37.50–42.50 -->
+      <section data-beat="usage">
+        <h2 class="abs h2 us-cap" data-el="usage.cap">Usage reports that keep records private.</h2>
+        <div class="abs card us-card" data-el="usage.card">
+          <h2 class="h2" data-el="usage.title">Utilisation</h2>
+          <div class="us-row"><div class="lab ui"><span data-el="usage.out-label">Outpatient</span><span data-el="usage.out-pct">62%</span></div><div class="bar"><i data-el="usage.out-bar" data-decorative></i></div></div>
+          <div class="us-row"><div class="lab ui"><span data-el="usage.den-label">Dental</span><span data-el="usage.den-pct">24%</span></div><div class="bar"><i data-el="usage.den-bar" data-decorative></i></div></div>
+          <div class="us-foot cap" data-el="usage.foot"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V8a4 4 0 018 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span data-el="usage.foot-text">Needs 5+ employees to show a category</span></div>
+        </div>
+      </section>
+
+      <!-- 9 payoff 42.50–50.00 (frame A) -->
+      <section data-beat="payoff">
+        <div class="abs po-logo"><div class="logo"><span class="plus" data-el="payoff.plus" data-decorative></span><span class="wm" data-el="payoff.wordmark">SyloCare<small>BUSINESS</small></span></div></div>
+        <div class="abs po-copy">
+          <span class="pill po-pill" data-el="payoff.pill">SYLOCARE FOR BUSINESS</span>
+          <h1 class="po-h" data-el="payoff.headline">Give your team real health cover — <em data-el="payoff.headline-green">set it up yourself, today.</em></h1>
+          <p class="body po-body" data-el="payoff.body">Nigeria, Ghana and Kenya. Paid in the currency your business already uses.</p>
+        </div>
+        <div class="abs card po-card" data-el="payoff.card">
+          <div class="tabs"><span data-el="payoff.tab1">1 · Sign up</span><span data-el="payoff.tab2">2 · Assign plans</span><span data-el="payoff.tab3">3 · Track usage</span></div>
+          <div class="po-row"><div class="lab ui"><span data-el="payoff.r1-label">Outpatient</span><span data-el="payoff.r1-amt">$296.83</span></div><div class="bar"><i data-el="payoff.r1-bar" data-decorative></i></div></div>
+          <div class="po-row"><div class="lab ui"><span data-el="payoff.r2-label">Dental</span><span data-el="payoff.r2-amt">$106.63</span></div><div class="bar"><i data-el="payoff.r2-bar" data-decorative></i></div></div>
+          <div class="po-row"><div class="lab ui"><span data-el="payoff.r3-label">Optical</span><span data-el="payoff.r3-amt">$69.52</span></div><div class="bar"><i data-el="payoff.r3-bar" data-decorative></i></div></div>
+          <p class="cap po-foot" data-el="payoff.foot">Checked 42 of 45 employees just now</p>
+        </div>
+      </section>
+
+      <!-- 10 cta 50.00–57.50 -->
+      <section data-beat="cta" class="dark">
+        <div class="abs cta-col">
+          <span class="plus cta-plus" data-el="cta.plus" data-decorative></span>
+          <h1 class="h1 cta-name" data-el="cta.name">SyloCare for Business</h1>
+          <p class="cta-tag" data-el="cta.tagline">Cover for your whole team, minus the operational headache.</p>
+          <span class="btn cta-btn" data-el="cta.button">Get Started</span>
+          <span class="cta-url" data-el="cta.url">sylocare.com/corporate</span>
+        </div>
+      </section>
+
+      <!-- global: dashboard shell, visible 17.50–37.50 across add-team → currency -->
+      <div class="sidebar" data-el="global.sidebar">
+        <div class="logo"><span class="plus" data-el="global.plus" data-decorative></span><span class="wm" data-el="global.wordmark">SyloCare<small>BUSINESS</small></span></div>
+        <span class="nav" data-el="global.nav-overview">Overview</span>
+        <span class="nav" data-el="global.nav-employees">Employees</span>
+        <span class="nav" data-el="global.nav-plans">Plan Catalog</span>
+        <span class="nav" data-el="global.nav-enrollment">Enrollment</span>
+        <span class="nav" data-el="global.nav-utilisation">Utilisation</span>
+      </div>
+      <div class="user" data-el="global.user"><span class="avatar" data-el="global.avatar">AO</span><div><span class="nm" data-el="global.user-name">Amara Okafor</span><span class="rl" data-el="global.user-role">HR · Meridian EOR Group · London</span></div></div>
+    </div>
+  </div>
+  <div id="controls"></div>
+  <script src="timeline.js"></script>
+  <script src="runtime.js"></script>
+</body>
+</html>
