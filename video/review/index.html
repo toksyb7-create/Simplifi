@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video review</title>
+<style>
+  :root { --bg:#121212; --panel:#1b1b1b; --line:#2c2c2c; --ink:#e8e8e8; --muted:#9a9a9a; --accent:#f0b429; --ok:#3fb950; --err:#f85149; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, sans-serif; }
+  body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: minmax(0, 1fr) auto; height: 100vh; }
+  @media (max-width: 900px) { body { grid-template-columns: 1fr; grid-template-rows: auto auto auto; height: auto; } }
+  #player { position: relative; background: #000; min-height: 240px; }
+  #player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  #player.picking iframe { cursor: crosshair; outline: 2px solid var(--accent); outline-offset: -2px; }
+  #bar { grid-column: 1; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--panel); border-top: 1px solid var(--line); }
+  #bar button, aside button { height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: #242424; color: var(--ink); cursor: pointer; font: inherit; }
+  #bar button:hover, aside button:hover { border-color: #555; }
+  #track { position: relative; flex: 1; height: 34px; display: flex; align-items: center; }
+  #scrub { width: 100%; margin: 0; }
+  #pins { position: absolute; left: 0; right: 0; top: 0; height: 8px; pointer-events: none; }
+  #pins i { position: absolute; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--accent); }
+  #pins b { position: absolute; width: 1px; height: 6px; background: #666; }
+  #tc { font-variant-numeric: tabular-nums; min-width: 64px; }
+  #beat { color: var(--muted); min-width: 90px; }
+  #au { font-size: 12px; color: var(--err); }
+  aside { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; border-left: 1px solid var(--line); background: var(--panel); min-height: 0; }
+  @media (max-width: 900px) { aside { grid-column: 1; grid-row: auto; border-left: 0; border-top: 1px solid var(--line); } }
+  aside section { padding: 14px; border-bottom: 1px solid var(--line); }
+  aside h2 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  textarea { width: 100%; min-height: 72px; resize: vertical; background: #101010; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px; font: inherit; }
+  .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+  .chip { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: #262626; color: var(--muted); }
+  .chip.el { color: var(--accent); }
+  #list { flex: 1; overflow: auto; padding: 0 14px; }
+  .note { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .note .t { font-variant-numeric: tabular-nums; color: var(--accent); cursor: pointer; border: 0; background: none; padding: 0; font: inherit; }
+  .note .x { float: right; border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .note p { margin: 4px 0 0; white-space: pre-wrap; }
+  .change { padding: 6px 0; color: var(--muted); }
+  .change button { color: var(--ink); border: 0; background: none; padding: 0; cursor: pointer; font: inherit; text-decoration: underline; }
+  #actions { padding: 14px; display: grid; gap: 8px; border-top: 1px solid var(--line); }
+  #send { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+  #approve { border-color: var(--ok); color: var(--ok); }
+  #status { min-height: 1.4em; color: var(--muted); font-size: 13px; }
+  .empty { color: var(--muted); padding: 10px 0; }
+</style>
+</head>
+<body>
+  <div id="player"><iframe id="v" src="../?embed=1" title="Video" allow="autoplay"></iframe></div>
+  <div id="bar">
+    <button id="pp" aria-label="Play">▶</button>
+    <div id="track"><input id="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="Scrub"><div id="pins"></div></div>
+    <span id="tc">0:00.00</span><span id="beat"></span><span id="au"></span>
+  </div>
+  <aside>
+    <section id="changes" hidden><h2>Changed since last round</h2><div id="changeList"></div></section>
+    <section>
+      <h2>Note at <span id="noteAt">0:00.00</span></h2>
+      <textarea id="text" placeholder="What should change here? (pauses the video while you type)"></textarea>
+      <div class="row">
+        <button id="pick" title="Click an element in the video to attach it">Pick element</button>
+        <span id="picked" class="chip el" hidden></span>
+        <span style="flex:1"></span>
+        <button id="add">Add note ⏎</button>
+      </div>
+    </section>
+    <div id="list"></div>
+    <div id="actions">
+      <button id="send">Send all notes to Claude</button>
+      <button id="approve">Approve — no changes needed</button>
+      <div id="status"></div>
+    </div>
+  </aside>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const iframe = $('#v');
+  const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`;
+  const KEY = 'video-review-draft:' + location.pathname;
+  let V = null, notes = [], picked = null, picking = false;
+  try { notes = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch {} };
+
+  iframe.addEventListener('load', async () => {
+    const w = iframe.contentWindow;
+    await new Promise((r) => { const c = () => (w.__video ? r() : setTimeout(c, 30)); c(); });
+    V = w.__video; await V.ready;
+    $('#scrub').max = V.duration; $('#scrub').step = 1 / V.fps;
+    for (const b of V.beats) { const m = document.createElement('b'); m.style.left = (b.start / V.duration) * 100 + '%'; $('#pins').appendChild(m); }
+    const t0 = +(new URLSearchParams(location.search).get('t') || 0); if (t0) V.setTime(t0);
+    w.document.addEventListener('click', onPick, true);
+    w.addEventListener('keydown', onKey);
+    render(); tick(); loadChanges();
+  });
+
+  function tick() {
+    if (V) {
+      $('#scrub').value = V.time; $('#tc').textContent = fmt(V.time); $('#noteAt').textContent = fmt(V.time);
+      const b = V.beats.find((b) => V.time >= b.start && V.time < b.end); $('#beat').textContent = b ? b.id : '';
+      $('#pp').textContent = V.playing ? '❚❚' : '▶';
+      const a = V.audio.state;
+      $('#au').textContent = a === 'blocked' ? 'music blocked — press ▶ again' : a === 'error' ? 'music file failed to load' : a === 'none' ? 'no music' : '';
+    }
+    requestAnimationFrame(tick);
+  }
+  $('#pp').onclick = () => V && V.toggle();
+  $('#scrub').oninput = (e) => V && V.setTime(+e.target.value);
+  $('#text').addEventListener('focus', () => V && V.pause());
+  $('#text').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); add(); } });
+  function onKey(e) {
+    if (!V || e.target.tagName === 'TEXTAREA') return;
+    if (e.code === 'Space') { e.preventDefault(); V.toggle(); }
+    if (e.code === 'ArrowRight') V.setTime(V.time + (e.shiftKey ? 1 : 1 / V.fps));
+    if (e.code === 'ArrowLeft') V.setTime(V.time - (e.shiftKey ? 1 : 1 / V.fps));
+    if (e.key === 'n') { e.preventDefault(); $('#text').focus(); }
+  }
+  addEventListener('keydown', onKey);
+
+  $('#pick').onclick = () => { picking = !picking; $('#player').classList.toggle('picking', picking); $('#pick').textContent = picking ? 'Click in video…' : 'Pick element'; if (picking && V) V.pause(); };
+  function onPick(e) {
+    if (!picking) return;
+    e.preventDefault(); e.stopPropagation();
+    const el = e.target.closest && e.target.closest('[data-el]');
+    picked = el ? el.dataset.el : null;
+    $('#picked').hidden = !picked; $('#picked').textContent = picked || '';
+    picking = false; $('#player').classList.remove('picking'); $('#pick').textContent = 'Pick element';
+    $('#text').focus();
+  }
+
+  function add() {
+    const text = $('#text').value.trim(); if (!text || !V) return;
+    const b = V.beats.find((b) => V.time >= b.start && V.time < b.end);
+    notes.push({ id: Date.now().toString(36), t: +V.time.toFixed(3), tc: fmt(V.time), beat: b ? b.id : null, el: picked, text });
+    notes.sort((a, b) => a.t - b.t);
+    $('#text').value = ''; picked = null; $('#picked').hidden = true;
+    save(); render();
+  }
+  $('#add').onclick = add;
+
+  function render() {
+    const list = $('#list'); list.innerHTML = '';
+    if (!notes.length) list.innerHTML = '<div class="empty">No notes yet. Scrub to a moment, type what should change, press Enter.</div>';
+    for (const n of notes) {
+      const d = document.createElement('div'); d.className = 'note';
+      d.innerHTML = `<button class="x" title="Delete">✕</button><button class="t"></button> <span class="chip"></span> <span class="chip el"></span><p></p>`;
+      d.querySelector('.t').textContent = n.tc; d.querySelector('.t').onclick = () => V.setTime(n.t);
+      d.querySelector('.chip').textContent = n.beat || '—';
+      const ce = d.querySelector('.chip.el'); if (n.el) ce.textContent = n.el; else ce.remove();
+      d.querySelector('p').textContent = n.text;
+      d.querySelector('.x').onclick = () => { notes = notes.filter((x) => x !== n); save(); render(); };
+      list.appendChild(d);
+    }
+    const pins = $('#pins'); pins.querySelectorAll('i').forEach((i) => i.remove());
+    if (V) for (const n of notes) { const i = document.createElement('i'); i.style.left = (n.t / V.duration) * 100 + '%'; pins.appendChild(i); }
+    $('#send').textContent = notes.length ? `Send ${notes.length} note${notes.length > 1 ? 's' : ''} to Claude` : 'Send all notes to Claude';
+  }
+
+  async function loadChanges() {
+    try {
+      const r = await fetch('changes.json', { cache: 'no-store' }); if (!r.ok) return;
+      const c = await r.json(); if (!c.changes || !c.changes.length) return;
+      $('#changes').hidden = false;
+      $('#changes h2').textContent = `Changed in round ${c.round}`;
+      const box = $('#changeList');
+      for (const ch of c.changes) {
+        const d = document.createElement('div'); d.className = 'change';
+        const b = document.createElement('button'); b.textContent = fmt(ch.t); b.onclick = () => V.setTime(ch.t);
+        d.append(b, ' ' + ch.summary); box.appendChild(d);
+      }
+    } catch {}
+  }
+
+  const status = (s, color) => { $('#status').textContent = s; $('#status').style.color = color || ''; };
+  $('#send').onclick = async () => {
+    if (!notes.length) return status('Add at least one note first.');
+    status('Sending…');
+    try {
+      const r = await fetch('/__notes', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ notes }) });
+      const j = await r.json(); if (!r.ok) throw new Error(j.error);
+      notes = []; save(); render();
+      status(`Round ${j.round} sent. Tell Claude "notes sent" (or just "done").`, 'var(--ok)');
+    } catch (e) {
+      // no server (e.g. opened as a file, or Claude runs remotely): hand the notes over via the clipboard
+      const text = 'Video review notes:\n' + notes.map((n) => `- ${n.tc} [${n.beat || '?'}${n.el ? ' / ' + n.el : ''}] ${n.text}`).join('\n');
+      try { await navigator.clipboard.writeText(text); status('Review server not reachable — notes copied. Paste them to Claude in chat.', 'var(--accent)'); }
+      catch { prompt('Review server not reachable. Copy these notes and paste them to Claude:', text); }
+    }
+  };
+  $('#approve').onclick = async () => {
+    if (notes.length && !confirm(`You have ${notes.length} unsent note(s). Approve anyway and discard them?`)) return;
+    try {
+      await fetch('/__approve', { method: 'POST' });
+      notes = []; save(); render();
+      status('Approved. Tell Claude "approved" to render the mp4.', 'var(--ok)');
+    } catch (e) { status('Could not reach the review server: ' + e.message, 'var(--err)'); }
+  };
+})();
+</script>
+</body>
+</html>

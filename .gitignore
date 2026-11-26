@@ -1,3 +1,4 @@
 video/.measure.json
 video/out/
-video/review/
+video/review/*
+!video/review/index.html
