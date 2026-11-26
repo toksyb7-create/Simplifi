@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=block" rel="stylesheet"><title>Frame C</title><style>/* shared tokens for style frames — same values go into video.md */
+:root{
+  --bg:#F5F7F5; --surface:#FFFFFF; --ink:#0F1A13; --muted:#5E6A62; --line:#E3E8E4;
+  --accent:#22DD1A; --accent-text:#119A0C; --accent-tint:#E8FBE6; --deep:#0A3A26; --deep-2:#0E4A31; --on-deep:#F2F7F3;
+  --fs-display:112px; --fs-h1:80px; --fs-h2:52px; --fs-body:34px; --fs-ui:30px; --fs-caption:24px; --safe:96px;
+}
+html,body{margin:0;height:100%;background:#1b1b1b;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  font-family:"Plus Jakarta Sans",sans-serif;color:var(--ink);background:var(--bg)}
+.logo{display:flex;align-items:center;gap:14px;font-weight:700;font-size:34px;letter-spacing:-.01em}
+.logo .plus{position:relative;width:40px;height:40px}
+.logo .plus:before,.logo .plus:after{content:"";position:absolute;background:var(--accent);border-radius:5px}
+.logo .plus:before{left:13px;top:0;width:14px;height:40px}.logo .plus:after{top:13px;left:0;width:40px;height:14px}
+.logo small{display:block;font-size:12px;letter-spacing:.3em;color:var(--accent-text);font-weight:700;margin-top:-4px}
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:10px 26px;font-size:var(--fs-caption);font-weight:600;letter-spacing:.04em}
+.card{background:var(--surface);border-radius:32px;box-shadow:0 2px 0 rgba(15,26,19,.04),0 30px 60px -30px rgba(15,26,19,.25)}
+.bar{height:16px;border-radius:99px;background:#EEF1EE}.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+#stage{background:var(--surface)}
+.c-ui{position:absolute;left:96px;top:96px;width:1060px;height:888px;border-radius:32px;background:var(--bg);padding:56px 56px;box-sizing:border-box}
+.c-ui h2{font-size:44px;font-weight:700;margin:0;letter-spacing:-.02em}
+.c-ui .sub{font-size:28px;color:var(--muted);margin:14px 0 40px}
+.step{display:flex;align-items:center;gap:28px;background:#fff;border-radius:22px;padding:28px 32px;margin-bottom:20px}
+.step b{display:block;font-size:var(--fs-ui);font-weight:700}.step span{font-size:24px;color:var(--muted)}
+.tick{flex:none;width:52px;height:52px;border-radius:50%;background:var(--accent);display:grid;place-items:center}
+.tick:after{content:"";width:18px;height:10px;border-left:4px solid var(--ink);border-bottom:4px solid var(--ink);transform:translateY(-3px) rotate(-45deg)}
+.step.now{outline:4px solid var(--accent)}
+.c-copy{position:absolute;left:1240px;top:96px;width:584px;height:888px;display:flex;flex-direction:column;justify-content:space-between}
+.c-copy h1{font-size:var(--fs-h1);line-height:1.04;letter-spacing:-.035em;font-weight:800;margin:0}
+.c-copy h1 em{font-style:normal;color:var(--accent-text)}
+.c-copy p{font-size:var(--fs-caption);color:var(--muted);margin:24px 0 0;line-height:1.4}
+</style></head><body><div id="stage">
+<div class="c-ui"><h2>Getting started</h2><div class="sub">Four steps to get your first employees covered.</div>
+<div class="step"><i class="tick"></i><div><b>Add your employees</b><span>List who you're covering, with their department.</span></div></div>
+<div class="step"><i class="tick"></i><div><b>Save a plan you're considering</b><span>Shortlist plans from the catalog before you commit.</span></div></div>
+<div class="step"><i class="tick"></i><div><b>Create an enrollment batch</b><span>Pick an HMO and assign plans to your employees.</span></div></div>
+<div class="step now"><i class="tick"></i><div><b>Pay to activate cover</b><span>Complete payment so your employees can be onboarded.</span></div></div></div>
+<div class="c-copy"><div class="logo"><span class="plus"></span><span>SyloCare<small>BUSINESS</small></span></div>
+<div><h1>Give your team real health cover — <em>set it up yourself, today.</em></h1><p>Nigeria, Ghana and Kenya. Paid in the currency your business already uses.</p></div></div>
+</div><script>function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('stage').style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();</script></body></html>

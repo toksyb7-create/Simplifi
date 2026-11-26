@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=block" rel="stylesheet"><title>Frame A</title><style>/* shared tokens for style frames — same values go into video.md */
+:root{
+  --bg:#F5F7F5; --surface:#FFFFFF; --ink:#0F1A13; --muted:#5E6A62; --line:#E3E8E4;
+  --accent:#22DD1A; --accent-text:#119A0C; --accent-tint:#E8FBE6; --deep:#0A3A26; --deep-2:#0E4A31; --on-deep:#F2F7F3;
+  --fs-display:112px; --fs-h1:80px; --fs-h2:52px; --fs-body:34px; --fs-ui:30px; --fs-caption:24px; --safe:96px;
+}
+html,body{margin:0;height:100%;background:#1b1b1b;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  font-family:"Plus Jakarta Sans",sans-serif;color:var(--ink);background:var(--bg)}
+.logo{display:flex;align-items:center;gap:14px;font-weight:700;font-size:34px;letter-spacing:-.01em}
+.logo .plus{position:relative;width:40px;height:40px}
+.logo .plus:before,.logo .plus:after{content:"";position:absolute;background:var(--accent);border-radius:5px}
+.logo .plus:before{left:13px;top:0;width:14px;height:40px}.logo .plus:after{top:13px;left:0;width:40px;height:14px}
+.logo small{display:block;font-size:12px;letter-spacing:.3em;color:var(--accent-text);font-weight:700;margin-top:-4px}
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:10px 26px;font-size:var(--fs-caption);font-weight:600;letter-spacing:.04em}
+.card{background:var(--surface);border-radius:32px;box-shadow:0 2px 0 rgba(15,26,19,.04),0 30px 60px -30px rgba(15,26,19,.25)}
+.bar{height:16px;border-radius:99px;background:#EEF1EE}.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.a-logo{position:absolute;left:96px;top:80px}
+.a-copy{position:absolute;left:96px;top:250px;width:930px}
+.a-copy h1{font-size:var(--fs-display);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:36px 0 0}
+.a-copy h1 em{font-style:normal;color:var(--accent-text)}
+.a-copy p{font-size:var(--fs-body);line-height:1.35;color:var(--muted);margin:40px 0 0;width:820px}
+.a-card{position:absolute;left:1120px;top:250px;width:704px;box-sizing:border-box;padding:40px 44px}
+.tabs{display:flex;background:#F0F2F0;border-radius:18px;padding:8px;font-size:24px;color:var(--muted);font-weight:500}
+.tabs span{flex:1;text-align:center;padding:14px 0;border-radius:12px}.tabs .on{background:#fff;color:var(--ink);font-weight:700}
+.row{margin-top:36px}.row div{display:flex;justify-content:space-between;font-size:var(--fs-ui);font-weight:500;margin-bottom:14px}
+.foot{margin-top:40px;font-size:var(--fs-caption);color:var(--muted)}
+</style></head><body><div id="stage">
+<div class="logo a-logo"><span class="plus"></span><span>SyloCare<small>BUSINESS</small></span></div>
+<div class="a-copy"><span class="pill">SYLOCARE FOR BUSINESS</span>
+<h1>Give your team real health cover — <em>set it up yourself, today.</em></h1>
+<p>Nigeria, Ghana and Kenya. Paid in the currency your business already uses.</p></div>
+<div class="card a-card"><div class="tabs"><span>1 · Sign up</span><span>2 · Assign plans</span><span class="on">3 · Track usage</span></div>
+<div class="row"><div><span>Outpatient</span><span>₦412,000</span></div><div class="bar"><i style="width:82%"></i></div></div>
+<div class="row"><div><span>Dental</span><span>₦148,000</span></div><div class="bar"><i style="width:41%"></i></div></div>
+<div class="row"><div><span>Optical</span><span>₦96,500</span></div><div class="bar"><i style="width:27%"></i></div></div>
+<div class="foot">Checked 42 of 45 employees just now</div></div>
+</div><script>function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('stage').style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();</script></body></html>

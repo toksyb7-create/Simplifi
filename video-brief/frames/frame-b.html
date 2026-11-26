@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=block" rel="stylesheet"><title>Frame B</title><style>/* shared tokens for style frames — same values go into video.md */
+:root{
+  --bg:#F5F7F5; --surface:#FFFFFF; --ink:#0F1A13; --muted:#5E6A62; --line:#E3E8E4;
+  --accent:#22DD1A; --accent-text:#119A0C; --accent-tint:#E8FBE6; --deep:#0A3A26; --deep-2:#0E4A31; --on-deep:#F2F7F3;
+  --fs-display:112px; --fs-h1:80px; --fs-h2:52px; --fs-body:34px; --fs-ui:30px; --fs-caption:24px; --safe:96px;
+}
+html,body{margin:0;height:100%;background:#1b1b1b;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  font-family:"Plus Jakarta Sans",sans-serif;color:var(--ink);background:var(--bg)}
+.logo{display:flex;align-items:center;gap:14px;font-weight:700;font-size:34px;letter-spacing:-.01em}
+.logo .plus{position:relative;width:40px;height:40px}
+.logo .plus:before,.logo .plus:after{content:"";position:absolute;background:var(--accent);border-radius:5px}
+.logo .plus:before{left:13px;top:0;width:14px;height:40px}.logo .plus:after{top:13px;left:0;width:40px;height:14px}
+.logo small{display:block;font-size:12px;letter-spacing:.3em;color:var(--accent-text);font-weight:700;margin-top:-4px}
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:10px 26px;font-size:var(--fs-caption);font-weight:600;letter-spacing:.04em}
+.card{background:var(--surface);border-radius:32px;box-shadow:0 2px 0 rgba(15,26,19,.04),0 30px 60px -30px rgba(15,26,19,.25)}
+.bar{height:16px;border-radius:99px;background:#EEF1EE}.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+#stage{background:var(--deep);color:var(--on-deep)}
+.logo{color:var(--on-deep)}.logo small{color:var(--accent)}
+.b-logo{position:absolute;left:96px;top:80px}
+.b-copy{position:absolute;left:96px;bottom:110px;width:1180px}
+.b-copy h1{font-size:var(--fs-display);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:0}
+.b-copy h1 em{font-style:normal;color:var(--accent)}
+.b-card{position:absolute;right:96px;top:110px;width:560px;padding:40px 44px;color:var(--ink)}
+.b-card .k{font-size:var(--fs-caption);color:var(--muted)}
+.b-card .amt{font-size:84px;font-weight:800;letter-spacing:-.03em;margin:14px 0 6px}
+.chips{display:flex;gap:14px;margin-top:30px}
+.chips span{font-size:var(--fs-caption);font-weight:600;padding:10px 20px;border-radius:999px;border:2px solid var(--line);color:var(--muted)}
+.chips .on{border-color:var(--accent);color:var(--accent-text);background:var(--accent-tint)}
+.markets{position:absolute;right:96px;top:496px;display:flex;gap:16px}
+.markets div{width:176px;padding:24px 0;border-radius:24px;background:var(--deep-2);text-align:center;font-size:28px;font-weight:600}
+.markets small{display:block;font-size:20px;font-weight:500;opacity:.7;margin-top:6px}
+</style></head><body><div id="stage">
+<div class="logo b-logo"><span class="plus"></span><span>SyloCare<small>BUSINESS</small></span></div>
+<div class="card b-card"><div class="k">Invoice · Meridian EOR Group</div><div class="amt">AED 10,430</div><div class="k">October invoice · paid in AED</div>
+<div class="chips"><span>USD</span><span>GBP</span><span class="on">AED</span></div></div>
+<div class="markets"><div>Nigeria<small>NGN · ₦</small></div><div>Ghana<small>GHS · ₵</small></div><div>Kenya<small>KES · KSh</small></div></div>
+<div class="b-copy"><h1>Give your team real health cover — <em>set it up yourself, today.</em></h1></div>
+</div><script>function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('stage').style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();</script></body></html>
